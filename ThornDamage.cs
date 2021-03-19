@@ -14,8 +14,7 @@ public class ThornDamage : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collider)
     {
-        if (!collider.gameObject.name.Equals("Knight"))
-        {
+        if (!collider.gameObject.name.Equals("Knight")) {
             player_health.deal_damage(1);
         }
     }
