@@ -18,12 +18,9 @@ public class PlayerSwap : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F1) && current_character != "Knight")
-        {
+        if (Input.GetKeyDown(KeyCode.F1) && current_character != "Knight") {
             update_character("Knight");
-        }
-        else if (Input.GetKeyDown(KeyCode.F2) && current_character != "Ninja")
-        {
+        } else if (Input.GetKeyDown(KeyCode.F2) && current_character != "Ninja") {
             update_character("Ninja");
         }
     }
@@ -48,8 +45,7 @@ public class PlayerSwap : MonoBehaviour
 
     void disable_non_default_characters()
     {
-        for (int i = 1; i < characters.Count; i++)
-        {
+        for (int i = 1; i < characters.Count; i++) {
             ((GameObject)characters[i]).SetActive(false);
         }
     }
