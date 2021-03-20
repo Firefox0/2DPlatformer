@@ -6,8 +6,8 @@ using UnityEngine;
 public class PlayerSwap : MonoBehaviour
 {
 
-    OrderedDictionary characters = new OrderedDictionary();
-    string current_character = "Knight";
+    public OrderedDictionary characters = new OrderedDictionary();
+    public string current_character = "Knight";
 
     void Start()
     {
