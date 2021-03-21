@@ -13,8 +13,8 @@ public class PlayerSwap : MonoBehaviour
     {
         current_character = default_character;
 
-        characters.Add("Knight", GameObject.Find("Knight"));
-        characters.Add("Ninja", GameObject.Find("Ninja"));
+        add_character("Knight");
+        add_character("Ninja");
         disable_non_default_characters();
     }
 
@@ -25,6 +25,11 @@ public class PlayerSwap : MonoBehaviour
         } else if (Input.GetKeyDown(KeyCode.F2) && current_character != "Ninja") {
             update_character("Ninja");
         }
+    }
+
+    void add_character(string name)
+    {
+        characters.Add(name, GameObject.Find(name));
     }
 
     void swap_character(string current_character, string next_character)
