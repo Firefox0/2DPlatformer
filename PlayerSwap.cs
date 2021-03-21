@@ -6,11 +6,14 @@ using UnityEngine;
 public class PlayerSwap : MonoBehaviour
 {
 
-    public OrderedDictionary characters = new OrderedDictionary();
-    public string current_character = "Knight";
+    public Dictionary<string, GameObject> characters = new Dictionary<string, GameObject>();
+    public string default_character = "Knight";
+    public string current_character;
 
     void Start()
     {
+        current_character = default_character;
+
         characters.Add("Knight", GameObject.Find("Knight"));
         characters.Add("Ninja", GameObject.Find("Ninja"));
         disable_non_default_characters();
@@ -27,13 +30,13 @@ public class PlayerSwap : MonoBehaviour
 
     void swap_character(string current_character, string next_character)
     {
-        ((GameObject)characters[current_character]).SetActive(false);
-        ((GameObject)characters[next_character]).SetActive(true);
+        characters[current_character].SetActive(false);
+        characters[next_character].SetActive(true);
     }
 
     void copy_position(string current_character, string next_character)
     {
-        ((GameObject)characters[next_character]).transform.position = ((GameObject)characters[current_character]).transform.position;
+        characters[next_character].transform.position = characters[current_character].transform.position;
     }
 
     void update_character(string next_character)
@@ -45,8 +48,9 @@ public class PlayerSwap : MonoBehaviour
 
     void disable_non_default_characters()
     {
-        for (int i = 1; i < characters.Count; i++) {
-            ((GameObject)characters[i]).SetActive(false);
+        foreach (KeyValuePair<string, GameObject> e in characters) {
+            characters[e.Key].SetActive(false);
         }
+        characters[default_character].SetActive(true);
     }
 }
