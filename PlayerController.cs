@@ -6,12 +6,8 @@ using UnityEngine;
 using UnityEngine.Events;
 
 //TODO: 
-// - add cooldowns
 // - add attacking (object vanishes if destroyed)
-// - refactoring
-// - super dash after walljumping
-// - replace left/right with horizontal direction
-// - replace 2 floats with vector2
+// - replace horizontal direction with func for right/left
 
 class Cooldown {
 	public bool state;
