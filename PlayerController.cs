@@ -1,4 +1,7 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,13 +10,19 @@ using UnityEngine.Events;
 // - add attacking (object vanishes if destroyed)
 // - refactoring
 // - super dash after walljumping
+// - replace left/right with horizontal direction
+
+class Cooldown {
+	public bool state;
+	public float current_timer;
+	public float original_timer;
+};
 
 public class PlayerController : MonoBehaviour
 {
 	public float run_speed;
 	public float jump_force;           // Amount of force added when the player jumps.
 	public float horizontal_direction = 0f;
-	public float dash_cooldown = 3;
 	const float circle_radius = 0.4f;
 	const float movement_smoothing = 0.02f;   // How much to smooth out the movement
 	const float walljump_horizontal_force = 7f;
@@ -28,8 +37,6 @@ public class PlayerController : MonoBehaviour
 	public bool jump = false;
 	public bool facing_right = true;          // For determining which way the player is currently facing.
 	public bool shift = false;
-	public bool left = false;
-	public bool right = false;
 	public bool dash_ready = true;
 	public bool walljumped = false;
 
@@ -43,7 +50,7 @@ public class PlayerController : MonoBehaviour
 	public Rigidbody2D Rigidbody2D;
 	public Vector3 Velocity = Vector3.zero;
 
-	Hashtable cooldowns = new Hashtable();
+	Dictionary<string, Cooldown> cooldowns = new Dictionary<string, Cooldown>();
 
 	void Awake() {
 		Rigidbody2D = GetComponent<Rigidbody2D>();
@@ -51,24 +58,20 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-
+		cooldowns.Add("Dash", new Cooldown() { state = true, current_timer = 3f, original_timer = 3f });
+		Debug.Log(cooldowns);
     }
 
     void Update()
     {
+		handle_cooldowns();
 		horizontal_direction = Input.GetAxisRaw("Horizontal");
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			jump = true;
 		} else if (Input.GetKeyDown(KeyCode.LeftShift)) {
 			shift = true;
 		}
-
-		if (Input.GetKey(KeyCode.A)) {
-			left = true;
-        } else if (Input.GetKey(KeyCode.D)) {
-			right = true;
-        }
-    }
+	}
 
     void FixedUpdate()
 	{
@@ -92,15 +95,28 @@ public class PlayerController : MonoBehaviour
 		shift = false;
 	}
 
-	/*
+	bool check_cooldown(string name)
+    {
+		if (cooldowns[name].state) {
+			cooldowns[name].state = false;
+			return true;
+        }
+		return false;
+    }
+
 	void handle_cooldowns()
     {
-		dash_timer -= Time.deltaTime;
-		if (dash_timer <= 0) {
-			dash_ready = true;
+		foreach (KeyValuePair<string, Cooldown> e in cooldowns) {
+			if (e.Value.state) {
+				continue;
+            }
+			e.Value.current_timer -= Time.deltaTime;
+			if (e.Value.current_timer <= 0) {
+				e.Value.current_timer = e.Value.original_timer;
+				e.Value.state = true;
+            }
         }
     }
-	*/
 
 	void handle_general_movement()
     {
@@ -130,15 +146,13 @@ public class PlayerController : MonoBehaviour
 		if (Rigidbody2D.velocity.y >= 0) {
 			return;
         }
-		if (!facing_right && !left || facing_right && !right) {
+		if (!facing_right && horizontal_direction != -1 || facing_right && horizontal_direction != 1) {
 			return;
         }
 		// Slow down if falling from a higher place.
 		Rigidbody2D.velocity = new Vector2(0f, Rigidbody2D.velocity.y / 2);
 
 		Rigidbody2D.gravityScale = 1;
-		left = false;
-		right = false;
 	}
 
 	void walljump(bool right)
@@ -157,6 +171,9 @@ public class PlayerController : MonoBehaviour
 
 	void Dash(bool right) 
 	{
+		if (!check_cooldown("Dash")) {
+			return;
+        }
 		float new_dash_horizontal_force = dash_horizontal_force;
 		float new_dash_vertical_force = dash_vertical_force;
 		// Add more force while airborne to compensate for gravity.
@@ -167,6 +184,10 @@ public class PlayerController : MonoBehaviour
 		if (!right) {
 			new_dash_horizontal_force *= -1;
         }
+		// TODO: Fix super dash after walljumping properly.
+		if (walljumped) {
+			new_dash_horizontal_force /= 7;
+		}
 		Rigidbody2D.velocity = new Vector2(new_dash_horizontal_force, new_dash_vertical_force);
 	}
 
