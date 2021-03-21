@@ -58,8 +58,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-		cooldowns.Add("Dash", new Cooldown() { state = true, current_timer = 3f, original_timer = 3f });
-		Debug.Log(cooldowns);
+		add_cooldown("Dash", 3f);
     }
 
     void Update()
@@ -94,6 +93,10 @@ public class PlayerController : MonoBehaviour
 		jump = false;
 		shift = false;
 	}
+	void add_cooldown(string name, float cooldown)
+    {
+		cooldowns.Add(name, new Cooldown() { state = true, current_timer = cooldown, original_timer = cooldown });
+    }
 
 	bool check_cooldown(string name)
     {
