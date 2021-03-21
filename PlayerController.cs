@@ -28,7 +28,6 @@ public class PlayerController : MonoBehaviour
 	Vector2 walljump_forces = new Vector2(7f, 15f);
 	Vector2 dash_forces = new Vector2(70f, 0f);
 	const float movement_smoothing = 0.02f;   // How much to smooth out the movement
-	const float dash_vertical_force = 0f;
 
 	public bool air_control = false;          // Whether or not a player can steer while jumping;
 	public bool allowed_to_walljump;
