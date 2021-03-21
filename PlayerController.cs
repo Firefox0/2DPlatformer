@@ -35,7 +35,6 @@ public class PlayerController : MonoBehaviour
 	public bool touching_wall;
 	public bool grounded;                    // Whether or not the player is grounded.
 	public bool jump = false;
-	public bool facing_right = true;          // For determining which way the player is currently facing.
 	public bool shift = false;
 	public bool dash_ready = true;
 	public bool walljumped = false;
@@ -81,7 +80,7 @@ public class PlayerController : MonoBehaviour
 			Jump();
 		}
 		if (shift) {
-			Dash(facing_right);
+			Dash(facing_right());
 		}
 		if (walljumped && grounded) {
 			walljumped = false;
@@ -93,6 +92,15 @@ public class PlayerController : MonoBehaviour
 		jump = false;
 		shift = false;
 	}
+
+	bool facing_right()
+    {
+		if (transform.localScale.x == -1) {
+			return false;
+        }
+		return true;
+    } 
+
 	void add_cooldown(string name, float cooldown)
     {
 		cooldowns.Add(name, new Cooldown() { state = true, current_timer = cooldown, original_timer = cooldown });
@@ -141,7 +149,7 @@ public class PlayerController : MonoBehaviour
 			return;
         }
 		wallslide();
-		walljump(facing_right);
+		walljump(facing_right());
 	}
 
 	void wallslide()
@@ -149,7 +157,7 @@ public class PlayerController : MonoBehaviour
 		if (Rigidbody2D.velocity.y >= 0) {
 			return;
         }
-		if (!facing_right && horizontal_direction != -1 || facing_right && horizontal_direction != 1) {
+		if (!facing_right() && horizontal_direction != -1 || facing_right() && horizontal_direction != 1) {
 			return;
         }
 		// Slow down if falling from a higher place.
@@ -163,7 +171,7 @@ public class PlayerController : MonoBehaviour
 		if (!jump) {
 			return;
         }
-		if (facing_right) {
+		if (facing_right()) {
 			Rigidbody2D.velocity = new Vector2(walljump_horizontal_force * -1, walljump_vertical_force);
 		} else {
 			Rigidbody2D.velocity = new Vector2(walljump_horizontal_force, walljump_vertical_force);
@@ -205,14 +213,13 @@ public class PlayerController : MonoBehaviour
 		Vector3 targetVelocity = new Vector2(move * 10f, Rigidbody2D.velocity.y);
 		// And then smoothing it out and applying it to the character
 		Rigidbody2D.velocity = Vector3.SmoothDamp(Rigidbody2D.velocity, targetVelocity, ref Velocity, movement_smoothing);
-		if (move > 0 && !facing_right || move < 0 && facing_right) {
+		if (move > 0 && !facing_right() || move < 0 && facing_right()) {
 			flip();
 		}
 	}
 
 	void flip() 
 	{
-		facing_right = !facing_right;
 		// Multiply the player's x local scale by -1.
 		Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
