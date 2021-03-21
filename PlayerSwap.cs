@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class PlayerSwap : MonoBehaviour
 {
-
     public Dictionary<string, GameObject> characters = new Dictionary<string, GameObject>();
     public string default_character = "Knight";
     public string current_character;
@@ -34,14 +33,17 @@ public class PlayerSwap : MonoBehaviour
         characters[next_character].SetActive(true);
     }
 
-    void copy_position(string current_character, string next_character)
+    void copy_attributes(string current_character, string next_character)
     {
         characters[next_character].transform.position = characters[current_character].transform.position;
+        characters[next_character].transform.localScale = new Vector3(characters[current_character].transform.localScale.x,
+                                                                      characters[next_character].transform.localScale.y,
+                                                                      characters[next_character].transform.localScale.z);
     }
 
     void update_character(string next_character)
     {
-        copy_position(current_character, next_character);
+        copy_attributes(current_character, next_character);
         swap_character(current_character, next_character);
         current_character = next_character;
     }
