@@ -41,9 +41,9 @@ public class PlayerSwap : MonoBehaviour
     void copy_attributes(string current_character, string next_character)
     {
         characters[next_character].transform.position = characters[current_character].transform.position;
-        characters[next_character].transform.localScale = new Vector3(characters[current_character].transform.localScale.x,
-                                                                      characters[next_character].transform.localScale.y,
-                                                                      characters[next_character].transform.localScale.z);
+        Vector3 new_scale = characters[next_character].transform.localScale;
+        new_scale.x = characters[current_character].transform.localScale.x;
+        characters[next_character].transform.localScale = new_scale;
     }
 
     void update_character(string next_character)
