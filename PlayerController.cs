@@ -11,6 +11,7 @@ using UnityEngine.Events;
 // - refactoring
 // - super dash after walljumping
 // - replace left/right with horizontal direction
+// - replace 2 floats with vector2
 
 class Cooldown {
 	public bool state;
@@ -24,10 +25,9 @@ public class PlayerController : MonoBehaviour
 	public float jump_force;           // Amount of force added when the player jumps.
 	public float horizontal_direction = 0f;
 	const float circle_radius = 0.4f;
+	Vector2 walljump_forces = new Vector2(7f, 15f);
+	Vector2 dash_forces = new Vector2(70f, 0f);
 	const float movement_smoothing = 0.02f;   // How much to smooth out the movement
-	const float walljump_horizontal_force = 7f;
-	const float walljump_vertical_force = 15f;
-	const float dash_horizontal_force = 70f;
 	const float dash_vertical_force = 0f;
 
 	public bool air_control = false;          // Whether or not a player can steer while jumping;
@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
 			return false;
         }
 		return true;
-    } 
+    }
 
 	void add_cooldown(string name, float cooldown)
     {
@@ -172,9 +172,9 @@ public class PlayerController : MonoBehaviour
 			return;
         }
 		if (facing_right()) {
-			Rigidbody2D.velocity = new Vector2(walljump_horizontal_force * -1, walljump_vertical_force);
+			Rigidbody2D.velocity = new Vector2(walljump_forces.x * -1, walljump_forces.y);
 		} else {
-			Rigidbody2D.velocity = new Vector2(walljump_horizontal_force, walljump_vertical_force);
+			Rigidbody2D.velocity = walljump_forces;
 		}
 		flip();
 		walljumped = true;
@@ -185,21 +185,20 @@ public class PlayerController : MonoBehaviour
 		if (!check_cooldown("Dash")) {
 			return;
         }
-		float new_dash_horizontal_force = dash_horizontal_force;
-		float new_dash_vertical_force = dash_vertical_force;
+		Vector2 new_dash_forces = dash_forces;
 		// Add more force while airborne to compensate for gravity.
 		if (!grounded) {
-			new_dash_horizontal_force *= 1.5f;
-			new_dash_vertical_force = 5f;
+			new_dash_forces.x *= 1.5f;
+			new_dash_forces.y = 5f;
         }
 		if (!right) {
-			new_dash_horizontal_force *= -1;
+			new_dash_forces.x *= -1;
         }
 		// TODO: Fix super dash after walljumping properly.
 		if (walljumped) {
-			new_dash_horizontal_force /= 7;
+			new_dash_forces.x /= 7;
 		}
-		Rigidbody2D.velocity = new Vector2(new_dash_horizontal_force, new_dash_vertical_force);
+		Rigidbody2D.velocity = new_dash_forces;
 	}
 
 	void Jump()
@@ -218,11 +217,10 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	void flip() 
+	public void flip() 
 	{
-		// Multiply the player's x local scale by -1.
-		Vector3 theScale = transform.localScale;
-		theScale.x *= -1;
-		transform.localScale = theScale;
+		Vector3 new_scale = transform.localScale;
+		new_scale.x *= -1;
+		transform.localScale = new_scale;
 	}
 }
