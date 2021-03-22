@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class PlayerHealth : MonoBehaviour
 {
 
-    public int health = 1;
+    public int health;
 
     public void deal_damage(int damage)
     {
