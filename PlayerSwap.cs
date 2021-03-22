@@ -12,7 +12,7 @@ public class PlayerSwap : MonoBehaviour
     void Start()
     {
         current_character = default_character;
-
+        // TODO: Take all child elements instead.
         add_character("Knight");
         add_character("Ninja");
         disable_non_default_characters();
