@@ -9,13 +9,7 @@ using UnityEngine.Events;
 // - add attacking (object vanishes if destroyed)
 // - replace horizontal direction with func for right/left
 
-class Cooldown {
-	public bool state;
-	public float current_timer;
-	public float original_timer;
-};
-
-public class PlayerController : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
 	public float run_speed;
 	public float jump_force;           // Amount of force added when the player jumps.
@@ -44,20 +38,15 @@ public class PlayerController : MonoBehaviour
 	public Rigidbody2D Rigidbody2D;
 	public Vector3 Velocity = Vector3.zero;
 
-	Dictionary<string, Cooldown> cooldowns = new Dictionary<string, Cooldown>();
+	PlayerCooldowns player_cooldowns;
 
 	void Awake() {
 		Rigidbody2D = GetComponent<Rigidbody2D>();
+		player_cooldowns = GameObject.Find("Player").GetComponent<PlayerCooldowns>();
 	}
-
-    void Start()
-    {
-		add_cooldown("Dash", 3f);
-    }
 
     void Update()
     {
-		handle_cooldowns();
 		horizontal_direction = Input.GetAxisRaw("Horizontal");
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			jump = true;
@@ -94,34 +83,6 @@ public class PlayerController : MonoBehaviour
 			return false;
         }
 		return true;
-    }
-
-	void add_cooldown(string name, float cooldown)
-    {
-		cooldowns.Add(name, new Cooldown() { state = true, current_timer = cooldown, original_timer = cooldown });
-    }
-
-	bool check_cooldown(string name)
-    {
-		if (cooldowns[name].state) {
-			cooldowns[name].state = false;
-			return true;
-        }
-		return false;
-    }
-
-	void handle_cooldowns()
-    {
-		foreach (KeyValuePair<string, Cooldown> e in cooldowns) {
-			if (e.Value.state) {
-				continue;
-            }
-			e.Value.current_timer -= Time.deltaTime;
-			if (e.Value.current_timer <= 0) {
-				e.Value.current_timer = e.Value.original_timer;
-				e.Value.state = true;
-            }
-        }
     }
 
 	void handle_general_movement()
@@ -177,7 +138,7 @@ public class PlayerController : MonoBehaviour
 
 	void Dash(bool right) 
 	{
-		if (!check_cooldown("Dash")) {
+		if (!player_cooldowns.check_cooldown("Dash")) {
 			return;
         }
 		Vector2 new_dash_forces = dash_forces;
@@ -203,9 +164,9 @@ public class PlayerController : MonoBehaviour
 
 	void Move(float move)
 	{
-		// Move the character by finding the target velocity
+		// Move the character by finding the target velocity.
 		Vector3 targetVelocity = new Vector2(move * 10f, Rigidbody2D.velocity.y);
-		// And then smoothing it out and applying it to the character
+		// And then smoothing it out and applying it to the character.
 		Rigidbody2D.velocity = Vector3.SmoothDamp(Rigidbody2D.velocity, targetVelocity, ref Velocity, movement_smoothing);
 		if (move > 0 && !facing_right() || move < 0 && facing_right()) {
 			flip();
