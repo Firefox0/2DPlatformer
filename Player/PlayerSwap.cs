@@ -18,9 +18,9 @@ public class PlayerSwap : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F1) && current_character != "Knight") {
+        if (Input.GetKeyDown(KeyCode.F1)) {
             update_character("Knight");
-        } else if (Input.GetKeyDown(KeyCode.F2) && current_character != "Ninja") {
+        } else if (Input.GetKeyDown(KeyCode.F2)) {
             update_character("Ninja");
         }
     }
@@ -49,6 +49,10 @@ public class PlayerSwap : MonoBehaviour
 
     void update_character(string next_character)
     {
+        if (current_character.Equals(next_character)) {
+            return;
+        }
+
         copy_attributes(current_character, next_character);
 
         // Apply the current velocity to the new character.
