@@ -12,9 +12,7 @@ public class PlayerSwap : MonoBehaviour
     void Start()
     {
         current_character = default_character;
-        // TODO: Take all child elements instead.
-        add_character("Knight");
-        add_character("Ninja");
+        add_characters();
         disable_non_default_characters();
     }
 
@@ -27,9 +25,11 @@ public class PlayerSwap : MonoBehaviour
         }
     }
 
-    void add_character(string name)
+    void add_characters()
     {
-        characters.Add(name, GameObject.Find(name));
+        foreach (Transform child in transform) {
+            characters.Add(child.name, GameObject.Find(child.name));
+        }
     }
 
     void swap_character(string current_character, string next_character)
