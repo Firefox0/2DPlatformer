@@ -28,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
 	public bool crouching = false;
 	public bool dash_ready = true;
 	public bool walljumped = false;
+	public bool wallsliding = false;
 
 	public LayerMask ground_layer;           // A mask determining what is ground to the character
 	public LayerMask wall_layer;
@@ -130,6 +131,7 @@ public class PlayerMovement : MonoBehaviour
     {
 		if (!touching_wall || grounded) {
 			Rigidbody2D.gravityScale = 3f;
+			wallsliding = false;
 			return;
         }
 		wallslide();
@@ -138,16 +140,18 @@ public class PlayerMovement : MonoBehaviour
 
 	void wallslide()
     {
+		if (wallsliding) {
+			return;
+        }
 		if (Rigidbody2D.velocity.y >= 0) {
 			return;
         }
 		if (!facing_right() && horizontal_direction != -1 || facing_right() && horizontal_direction != 1) {
 			return;
         }
-		// Slow down if falling from a higher place.
-		Rigidbody2D.velocity = new Vector2(0f, Rigidbody2D.velocity.y / 2);
-
-		Rigidbody2D.gravityScale = 1;
+		Rigidbody2D.gravityScale = 0.25f;
+		Rigidbody2D.velocity = new Vector2(0, 0);
+		wallsliding = true;
 	}
 
 	void walljump(bool right)
@@ -164,20 +168,20 @@ public class PlayerMovement : MonoBehaviour
 		walljumped = true;
 	}
 
-	void Dash(bool right) 
+	void Dash(bool right)
 	{
 		if (!player_cooldowns.check_cooldown("Dash")) {
 			return;
-        }
+		}
 		Vector2 new_dash_forces = dash_forces;
 		// Add more force while airborne to compensate for gravity.
 		if (!grounded) {
 			new_dash_forces.x *= 1.5f;
 			new_dash_forces.y = 5f;
-        }
+		}
 		if (!right) {
 			new_dash_forces.x *= -1;
-        }
+		}
 		// TODO: Fix super dash after walljumping properly.
 		if (walljumped) {
 			new_dash_forces.x /= 7;
