@@ -9,7 +9,7 @@ public class PlayerSwap : MonoBehaviour
     public string default_character = "Knight";
     public string current_character;
 
-    void Start()
+    void Awake()
     {
         current_character = default_character;
         add_characters();
@@ -23,6 +23,11 @@ public class PlayerSwap : MonoBehaviour
         } else if (Input.GetKeyDown(KeyCode.F2)) {
             update_character("Ninja");
         }
+    }
+
+    public GameObject get_current_object()
+    {
+        return characters[current_character];
     }
 
     void add_characters()
