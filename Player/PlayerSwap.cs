@@ -8,6 +8,10 @@ public class PlayerSwap : MonoBehaviour
     public Dictionary<string, GameObject> characters = new Dictionary<string, GameObject>();
     public string default_character = "Knight";
     public string current_character;
+    Dictionary<KeyCode, string> character_map = new Dictionary<KeyCode, string> {
+        {KeyCode.F1, "Knight"},
+        {KeyCode.F2, "Ninja"}
+    };
 
     void Awake()
     {
@@ -18,10 +22,16 @@ public class PlayerSwap : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F1)) {
-            update_character("Knight");
-        } else if (Input.GetKeyDown(KeyCode.F2)) {
-            update_character("Ninja");
+        check_user_input();
+    }
+
+    void check_user_input()
+    {
+        foreach (KeyValuePair<KeyCode, string> e in character_map) {
+            if (Input.GetKeyDown(e.Key)) {
+                update_character(e.Value);
+                break;
+            }
         }
     }
 
